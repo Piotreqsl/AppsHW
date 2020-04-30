@@ -4,45 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:weightSum="8"
     android:orientation="vertical"
-    tools:context=".MainActivity"
-    android:background="@color/colorPrimary">
+    tools:context=".WatchActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
+    <com.onionv2.apps.ZegarView
+        android:id="@+id/zegar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
-
+        android:layout_weight="6"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/karas" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Piotr Śliperski 2A"
-        android:textSize="24sp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/systemTime"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Start" />
+        android:text="Ustaw czas systemowy" />
 
     <Button
-        android:id="@+id/buttonWatch"
+        android:id="@+id/customTime"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="Zegar" />
-
+        android:text="Ustaw se wskazowki" />
 
 </LinearLayout>
