@@ -7,10 +7,9 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Shader;
-import android.os.Debug;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 
 import java.util.Calendar;
@@ -30,6 +29,8 @@ public class ZegarView extends View {
     private Rect rect = new Rect();
     private Canvas _canvas;
     private Calendar c;
+    private Calendar stoper = Calendar.getInstance();
+    private boolean isStoper = false;
 
 
     public ZegarView(Context context) {
@@ -53,14 +54,26 @@ public class ZegarView extends View {
         hourHandTruncation = min / 7;
         paint = new Paint();
         isInit = true;
+
+
+
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         if (!isInit) {
             startZegara();
+            stoper.set(Calendar.HOUR_OF_DAY, 0);
+            stoper.set(Calendar.MINUTE, 0);
+            stoper.set(Calendar.SECOND, 0);
+            stoper.set(Calendar.MILLISECOND, 0);
         }
         _canvas = canvas;
+
+        if(isStoper){
+            stoper.add(Calendar.SECOND, 1);
+            Log.d("adding", stoper.toString());
+        }
 
 
         Paint p = new Paint();
@@ -74,59 +87,89 @@ public class ZegarView extends View {
 
         //to słuzy do narysowania wszystkiego na nowo zeby sie wskazowki obracały
 
-        postInvalidateDelayed(1000);
-        invalidate();
+
+        postInvalidateDelayed(10);
+
+
+
+       // invalidate();
     }
 
-    private void rysujWskazowke(Canvas canvas, double loc, boolean isHour) {
+    private void rysujWskazowke(Canvas canvas, double loc, boolean isHour, boolean isColorDif) {
         double angle = Math.PI * loc / 30 - Math.PI / 2;
         int handRadius = isHour ? radius - handTruncation - hourHandTruncation : radius - handTruncation;
 
 
 
-        canvas.drawLine(width / 2, height / 2,
-                (float) (width / 2 + Math.cos(angle) * handRadius),
-                (float) (height / 2 + Math.sin(angle) * handRadius),
-                paint);
 
+        if(!isColorDif) {
+            canvas.drawLine(width / 2, height / 2,
+                    (float) (width / 2 + Math.cos(angle) * handRadius),
+                    (float) (height / 2 + Math.sin(angle) * handRadius),
+                    paint);
+        }else{
+
+
+            canvas.drawLine(width / 2, height / 2,
+                    (float) (width / 2 + Math.cos(angle) * handRadius),
+                    (float) (height / 2 + Math.sin(angle) * handRadius),
+                    paint);
+
+        }
     }
 
     private void rysujWskazowki(Canvas canvas, Calendar custom) {
+        if(isStoper){ // stoper chodzi
+
+
+            float hour = stoper.get(Calendar.HOUR_OF_DAY);
+            hour = hour > 12 ? hour - 12 : hour;
+            rysujWskazowke(canvas, (hour + stoper.get(Calendar.MINUTE) / 60) * 5f, true, false);
+            rysujWskazowke(canvas, stoper.get(Calendar.MINUTE), false, false);
+            rysujWskazowke(canvas, stoper.get(Calendar.SECOND), false, false);
+
+            return;
+        }
+
+        if(!isStoper && !isModeChosen){ // stoper zatrzymany
+
+
+            float hour = stoper.get(Calendar.HOUR_OF_DAY);
+            hour = hour > 12 ? hour - 12 : hour;
+            rysujWskazowke(canvas, (hour + stoper.get(Calendar.MINUTE) / 60) * 5f, true, false);
+            rysujWskazowke(canvas, stoper.get(Calendar.MINUTE), false, false);
+            rysujWskazowke(canvas, stoper.get(Calendar.SECOND), false, false);
+
+            return;
+        }
+
+
         if(isModeChosen && isSystem){
+
+            MediaPlayer mPlayer = MediaPlayer.create(getContext(), R.raw.tick);
+            mPlayer.start();
+
             Calendar c = Calendar.getInstance();
             float hour = c.get(Calendar.HOUR_OF_DAY);
             hour = hour > 12 ? hour - 12 : hour;
-            rysujWskazowke(canvas, (hour + c.get(Calendar.MINUTE) / 60) * 5f, true);
-            rysujWskazowke(canvas, c.get(Calendar.MINUTE), false);
-            rysujWskazowke(canvas, c.get(Calendar.SECOND), false);
+            rysujWskazowke(canvas, (hour + c.get(Calendar.MINUTE) / 60) * 5f, true, false);
+            rysujWskazowke(canvas, c.get(Calendar.MINUTE), false, false);
+            rysujWskazowke(canvas, c.get(Calendar.SECOND), false, false);
+            //rysujWskazowke(canvas, c.get(Calendar.MILLISECOND), false, true);
+
         }
 
         if(isModeChosen && !isSystem){
 
+
+
+
             float hour = custom.get(Calendar.HOUR_OF_DAY);
             hour = hour > 12 ? hour - 12 : hour;
-            rysujWskazowke(canvas, (hour + custom.get(Calendar.MINUTE) / 60) * 5f, true);
-            rysujWskazowke(canvas, custom.get(Calendar.MINUTE), false);
+            rysujWskazowke(canvas, (hour + custom.get(Calendar.MINUTE) / 60) * 5f, true, false);
+            rysujWskazowke(canvas, custom.get(Calendar.MINUTE), false, false);
         }
 
-
-
-    }
-
-
-
-    public void setSystemTime(){
-        isModeChosen = true;
-        isSystem = true;
-        rysujWskazowki(_canvas, c);
-    }
-
-    public void setCustomTime(Calendar c){
-        isModeChosen = true;
-        isSystem = false;
-        this.c = c;
-
-        rysujWskazowki(_canvas, c);
 
 
     }
@@ -157,5 +200,41 @@ public class ZegarView extends View {
         paint.setAntiAlias(true);
         canvas.drawCircle(width / 2, height / 2, radius + padding - 10, paint);
     }
+
+    public void setSystemTime(){
+        isModeChosen = true;
+        isSystem = true;
+        isStoper = false;
+        rysujWskazowki(_canvas, c);
+    }
+
+    public void setCustomTime(Calendar c){
+        isModeChosen = true;
+        isSystem = false;
+        isStoper = false;
+        this.c = c;
+        rysujWskazowki(_canvas, c);
+
+
+    }
+
+    public void startStoper(){
+        isModeChosen = false;
+        isSystem = false;
+        isStoper = !this.isStoper;
+
+        rysujWskazowki(_canvas, Calendar.getInstance());
+
+    }
+
+    public void zerujStoper(){
+        stoper.set(Calendar.HOUR_OF_DAY, 0);
+        stoper.set(Calendar.MINUTE, 0);
+        stoper.set(Calendar.SECOND, 0);
+        stoper.set(Calendar.MILLISECOND, 0);
+
+        rysujWskazowki(_canvas, Calendar.getInstance());
+    }
+
 
 }

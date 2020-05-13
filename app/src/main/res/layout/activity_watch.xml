@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:weightSum="8"
+    android:weightSum="12"
     android:orientation="vertical"
     tools:context=".WatchActivity">
 
@@ -13,7 +13,7 @@
         android:id="@+id/zegar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6"
+        android:layout_weight="8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,5 +31,19 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="Ustaw se wskazowki" />
+
+    <Button
+        android:id="@+id/stoper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Stoper" />
+
+    <Button
+        android:id="@+id/zeruj"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="Zeruj" />
 
 </LinearLayout>

@@ -51,7 +51,24 @@ public class WatchActivity extends AppCompatActivity {
             }
         });
 
+
+        findViewById(R.id.stoper).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zegarView.startStoper();
+            }
+        });
+
+        findViewById(R.id.zeruj).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zegarView.zerujStoper();
+            }
+        });
+
     }
+
+
 
 
 
